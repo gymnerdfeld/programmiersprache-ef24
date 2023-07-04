@@ -291,11 +291,11 @@ hallo
 ```
 Die Funktion `print` kann in der Variablen `ausdrucken` abgespeichert werden, und dann wieder als Funktion aufgerufen werden.  Und der Name der Funktion `print` kann als Variablennamen verwendet werden (auch wenn das vielleicht nicht sehr schlau scheint).  Python verwendet also ein und denselben Ort um Variablen _und_ Funktionen abzuspeichern.  Wir wollen das ähnlich machen, und machen keinen Unterschied zwischen Operatoren, Konstanten oder durch den oder die Benutzer:in definierte Variablen.  Dazu benennen wir `operators_and_constants` zu `operators_constants_and_variables` um. Gut, dass wir diesen `dict` nur ganz wenigen Orten verwenden.  (Wir finden dann schon noch einen besseren Namen, versprochen!)
 
-Zweitens stellt sich die Frage nach einer sinnvollen Syntax für die Definition von Variablen. Wir haben uns für das Schlüsselwort `var` gefolgt vom Namen der Variablen gefolgt vom Wert geeinigt.
+Zweitens stellt sich die Frage nach einer sinnvollen Syntax für die Definition von Variablen. Wir haben uns für das Schlüsselwort `sto` gefolgt vom Namen der Variablen gefolgt vom Wert geeinigt.
 
 Zum Beispiel:
 ```scheme
-> (var x 9)
+> (sto x 9)
 9
 > (sqrt x)
 3.0
@@ -311,7 +311,7 @@ def evaluate(expr):
             return operators_constants_and_variables [name]
 
         # Spezialkonstrukte
-        case ["var", name, value]:
+        case ["sto", name, value]:
             value = evaluate(value)
             operators_constants_and_variables [name] = value
             return value

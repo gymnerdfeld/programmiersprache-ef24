@@ -55,10 +55,7 @@ def fact(a):
 import math
 import random
 
-def pi():
-    return math.pi
-
-operators_and_constants = {
+operators_constants_and_variables = {
     "+": add,
     "-": sub,
     "*": mult,
@@ -75,24 +72,32 @@ operators_and_constants = {
 
 def evaluate(expr):
     match expr:
+        # Einfache Werte
         case int(number) | float(number):
             return number
         case str(name):
-            return operators_and_constants[name]
+            return operators_constants_and_variables[name]
+
+        # Spezialkonstrukte
+        case ["sto", name, value]:   # Wert abspeichern
+            value = evaluate(value)
+            operators_constants_and_variables[name] = value
+            return f"{name} stored: {value}"
+
+        # "Normale" Operatoren ausführen
         case [operator, *args]:
             function = evaluate(operator)
             args = [evaluate(arg) for arg in args]
             return function(*args)
+
+        # Unbekannter Ausdruck -> Fehler
         case _:
             raise ValueError("Unbekannter Ausdruck")
 
-print(evaluate(parse(tokenize("1"))))                     # -> 1
-print(evaluate(parse(tokenize("(+ 1 1)"))))               # -> 2
-print(evaluate(parse(tokenize("(+ (+ 1 2) (+ 3 4))"))))   # -> 10
-
-
-
 #=====================
+def run(program):
+    return evaluate(parse(tokenize(program)))
+
 def repl():
     """Read-Eval-Print-Loop
     
@@ -103,7 +108,7 @@ def repl():
             prog = input('> ').strip()
             if prog.lower() in ('q', 'quit', 'exit'):
                 break
-            print(evaluate(parse(tokenize(prog))))
+            print(run(prog))
         except Exception as e:
             print(f'{type(e).__name__}: {e}')
 
