@@ -27,16 +27,36 @@ def parse_atom(token):
             return int(token)
     else:
         return token
-    
-    
+
+def add(a, b):
+    return a + b
+
+operators = {
+    "+": add,
+}
+
+def evaluate(expr):
+    if isinstance(expr, int) or isinstance(expr, float):
+        return expr
+    elif isinstance(expr, list):
+        operator = expr[0]
+        function = operators[operator]
+        args = expr[1:]
+        args = [evaluate(arg) for arg in args]
+        return function(*args)
+
+print(evaluate(parse(tokenize("1"))))                     # -> 1
+print(evaluate(parse(tokenize("(+ 1 1)"))))               # -> 2
+print(evaluate(parse(tokenize("(+ (+ 1 2) (+ 3 4))"))))   # -> 10
+
+
+
 #=====================
 def repl():
     """Read-Eval-Print-Loop
     
     Usereingabe analysieren und evaluieren.
     """
-    evaluate(parse(tokenize(library)))
-
     while True:
         try:
             prog = input('> ').strip()
