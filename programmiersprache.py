@@ -31,8 +31,20 @@ def parse_atom(token):
 def add(a, b):
     return a + b
 
+def sub(a, b):
+    return a - b
+
+def mult(a, b):
+    return a * b
+
+def div(a, b):
+    return a / b
+
 operators = {
     "+": add,
+    "-": sub,
+    "*": mult,
+    "/": div,
 }
 
 def evaluate(expr):
@@ -71,8 +83,8 @@ if __name__ == '__main__':
     # Testcode
     tests = [
         (tokenize, ('(+ 1 1)',), ['(', '+', '1', '1', ')']),
-        (parse, (['(', '+', '1', '1', ')'],), ['+', 1, 1]),
         (parse_atom, ('1.1',), 1.1),
+        (parse, (['(', '+', '1', '1', ')'],), ['+', 1, 1]),
         (add, (1, 1), 2),
         (sub, (2, 1), 1),
         (mult, (2, 3), 6),
