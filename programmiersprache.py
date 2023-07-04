@@ -40,22 +40,51 @@ def mult(a, b):
 def div(a, b):
     return a / b
 
-operators = {
+def div_int(a, b):
+    return a // b
+
+def expt(a, b):
+    return a ** b
+
+def fact(a):
+    if a < 2:
+        return 1
+    else:
+        return a * fact(a - 1)
+
+import math
+import random
+
+def pi():
+    return math.pi
+
+operators_and_constants = {
     "+": add,
     "-": sub,
     "*": mult,
     "/": div,
+    "//": div_int,
+    "expt": expt,
+    "fact": fact,
+    "sin": math.sin,
+    "cos": math.cos,
+    "pi": math.pi,
+    "e": math.e,
+    "random": random.random,
 }
 
 def evaluate(expr):
-    if isinstance(expr, int) or isinstance(expr, float):
-        return expr
-    elif isinstance(expr, list):
-        operator = expr[0]
-        function = operators[operator]
-        args = expr[1:]
-        args = [evaluate(arg) for arg in args]
-        return function(*args)
+    match expr:
+        case int(number) | float(number):
+            return number
+        case str(name):
+            return operators_and_constants[name]
+        case [operator, *args]:
+            function = evaluate(operator)
+            args = [evaluate(arg) for arg in args]
+            return function(*args)
+        case _:
+            raise ValueError("Unbekannter Ausdruck")
 
 print(evaluate(parse(tokenize("1"))))                     # -> 1
 print(evaluate(parse(tokenize("(+ 1 1)"))))               # -> 2
