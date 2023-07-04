@@ -161,3 +161,97 @@ Jetzt können wir schrittweise den Code ausführen.  Zur besseren Übersicht ver
 ```py
     21
 ```
+
+
+## Schritt 1: Taschenrechner
+
+In einem ersten Schritt geht es darum, eine verschachtelte Rechnung zu berechnen.
+
+Um überhaupt etwas berechnen zu können, brauchen wir eine gewisse Anzahl von nützlichen Operation wie Plus, Minus und so weiter.  Wir schreiben dazu Funktionen in Python und speichern sie unter dem gewünschten Symbol in einem `dict` ab.
+
+```py
+def add(a, b):
+    return a + b
+
+...
+
+builtins = {
+    '+': add,
+    '-': sub,
+    '*': mult,
+    ...
+}
+```
+
+In der Analogie zum Taschenrechner entsprechen diese _eingebauten Funktionen_ den einzelnen Tasten auf dem Rechner.
+
+Bei der Berechnung einer verschachtelten Rechnung können zwei Fälle auftreten:
+1. Eine Zahl kann direkt wieder zurück gegeben werden.
+2. Bei einer Rechnung sind mehrere Schritte nötig:
+     * Funktion für den Operator in den `builtins` nachschlagen.
+     * Alle Argumente evaluieren, denn vielleicht ist da ja noch eine Rechnung mit dabei.  Hier ruft sich `evaluate` selber &ndash; also rekursiv &ndash; auf.
+     * Funktion mit den berechneten Werte für die Argumenten aufrufen, und das Resultat zurück geben.
+
+```py
+def evaluate(expr):
+    match expr:
+        # Einfache Werte
+        case int(num) | float(num):
+            return num
+
+        # Funktionen
+        case [op, *args]:
+            func = builtins[op]
+            args = [evaluate(arg) for arg in args]
+            return func(*args)
+```
+
+
+## Schritt 2: Taschenrechner mit Variablen
+
+Selbst bei einfachen Taschenrechnern können Werte zwischengespeichert werden. Darum möchten wir beliebige Werte unter beliebigen Namen abspeichern können.
+
+Die erste Frage, die sich stellt lautet: Wo speichern wir die Variablen ab? In einem separaten `dict` oder zusammen mit den eingebauten Funktionen in `builtins`?
+
+Schauen wir uns einmal an wie dies in Python funktioniert:
+
+```py
+>>> ausdrucken = print
+>>> ausdrucken("hallo")
+hallo
+>>> print = 5
+>>> ausdrucken(print)
+5
+```
+Die Funktion `print` kann in der Variablen `ausdrucken` abgespeichert werden, und dann wieder als Funktion aufgerufen werden.  Und der Name der Funktion `print` kann als Variablennamen verwendet werden (auch wenn das vielleicht nicht sehr schlau scheint).  Python verwendet also ein und denselben Ort um Variablen _und_ Funktionen abzuspeichern.
+
+Zweitens stellt sich die Frage nach einer sinnvollen Syntax für die Definition von Variablen. Wir haben uns für das Schlüsselwort `var` gefolgt vom Namen der Variablen gefolgt vom Wert geeinigt.
+
+Zum Beispiel:
+```scheme
+> (var x 9)
+9
+> (sqrt x)
+3.0
+```
+
+Damit das Ganze funktioniert, muss die Funktion `evaluate` erweitert werden:
+```py
+def evaluate(expr):
+    match expr:
+        # Einfache Werte
+        ...
+        case str(name):
+            return builtins[env]
+
+        # Spezialkonstrukte
+        case ["var", name, value]:
+            value = evaluate(value)
+            builtins[name] = value
+            return value
+        ...
+```
+
+Wenn also anstelle einer Zahl ein Name kommt, schlagen wir den in den `builtins` nach, und geben den gefundenen Wert zurück.
+
+Das Abspeichern einer Variablen muss ein Spezialkonstrukt sein, denn der Name der Variablen existiert zu diesem Zeitpunkt noch gar nicht.  Wenn einen neue Variable definiert wird, muss zuerst der Wert berechnet werden, der abgespeichert werden soll. Erst danach kann der berechnete Wert unter dem angegebenen Namen in `builtins` abgespeichert werden.
