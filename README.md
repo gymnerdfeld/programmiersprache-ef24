@@ -85,14 +85,16 @@ Der Code dazu ist zwar kurz, aber ziemlich schwer verständlich.  Wir vertrauen 
 Andererseits benutzten wir die Python-Funktionen `int` und `float` um zu versuchen, Strings mit Zahlen in Zahlen (`int` oder `float`) umzuwandeln:
 ```py
 def parse_atom(token):
-    try:
-        token = int(token)
-    except ValueError:
-        try:
-            token = float(token)
-        except ValueError:
-            pass
-    return token
+    if token[0] in "+-.0123456789" and token != "+" and token != "-":
+        # Token scheint eine Zahl zu sein (hoffentlich)
+        if "." in token:
+            # Float mit einem Dezimalpunkt
+            return float(token)
+        else:
+            # Int
+            return int(token)
+    else:
+        return token
 ```
 
 Bei Sprachen mit einer schönen Syntax ist die `parse`-Phase sehr komplex, und war lange ein zentrales Problem in der Informatikforschung.  Zum Beispiel musste bei Python der komplett `parse`-Code ersetzt werden, um die neue `match`-`case`-Syntax einführen zu können.
