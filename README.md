@@ -13,6 +13,7 @@
 * [Schritt 1: Einfacher Taschenrechner](#schritt-1-einfacher-taschenrechner)
 * [Schritt 2: Taschenrechner mit Konstanten](#schritt-2-taschenrechner-mit-konstanten)
 * [Schritt 3: Taschenrechner mit Variablen](#schritt-3-taschenrechner-mit-variablen)
+* [Schritt 4: Funktionen, erste Version](#schritt-4-funktionen-erste-version)
 
 ## Begriffe
 * **Host-Programmiersprache**: Die Programmiersprache, welche benutzt wurde, um eine Programmiersprache zu programmieren.  Bei uns ist das Python, bei Python ist es C.
@@ -21,6 +22,12 @@
 * **Parse**: Zweite Phase bei der Ausführung eines Programms. Das Übersetzen der Liste der Tokens in die _interne Darstellung_.
 * **Interne Darstellung**: Interne Darstellung eines Programms, oft in einer Baum-ähnlichen Struktur.  Bei uns wird ein Programm mit verschachtelten Listen, Strings und Zahlen dargestellt.
 * **Evaluate**: Dritte Phase bei der Ausführung eines Programms. Die interne Darstellung Schritt für Schritt ausführen, um am Schluss zu einem Resultat zu gelangen.
+* **Schlüsselwort**: Wort, welches in einer Programmiersprache eine spezielle Bedeutung hat, und darum zum Beispiel nicht als Variablen- oder Funktionsnamen verwendet werden darf.  In unserer Sprache beispielsweise `sto`, oder `def` in Python.
+* **Eingebaute Funktion**: Eine Funktion, welche in unserer Programmiersprache benutzt werden kann, aber in der Host-Programmiersprache programmiert wurde. Zum Beispiel `add` für die Addition zweier Zahlen.
+* **Library-Funktion**: Eine Funktion, welche in unserer Programmiersprache benutzt werden kann und auch in unserer Programmiersprache programmiert wurde.  Die Library-Funktionen werden vor der Ausführung eines Programms geladen.
+* **Lokale Variablen**: Variablen, welche nur innerhalb einer Funktion existieren.  Also alle Argumente der Funktion und auch alle Variablen, welche innerhalb der Funktion definiert wurden.
+* **Environment**: Ort um Werte wie Variablen und Funktionen abzuspeichern.  Das Environment ändert sich, und ist beispielsweise innerhalb einer Funktion anders als ausserhalb.  Für Environments verwenden wir Pythons `ChainMap`-Datenstruktur.
+* **Rekursion**: Funktionen die sich selber aufrufen. Zum Beispiel eine Funktion welche die Fakultät einer Zahl berechnet.
 
 
 ## Basis
@@ -289,16 +296,16 @@ hallo
 >>> ausdrucken(print)
 5
 ```
-Die Funktion `print` kann in der Variablen `ausdrucken` abgespeichert werden, und dann wieder als Funktion aufgerufen werden.  Und der Name der Funktion `print` kann als Variablennamen verwendet werden (auch wenn das vielleicht nicht sehr schlau scheint).  Python verwendet also ein und denselben Ort um Variablen _und_ Funktionen abzuspeichern.  Wir wollen das ähnlich machen, und machen keinen Unterschied zwischen Operatoren, Konstanten oder durch den oder die Benutzer:in definierte Variablen.  Dazu benennen wir `operators_and_constants` zu `operators_constants_and_variables` um. Gut, dass wir diesen `dict` nur ganz wenigen Orten verwenden.  (Wir finden dann schon noch einen besseren Namen, versprochen!)
+Die Funktion `print` kann in der Variablen `ausdrucken` abgespeichert werden, und dann wieder als Funktion aufgerufen werden.  Und der Name der Funktion `print` kann als Variablennamen verwendet werden (auch wenn das vielleicht nicht sehr schlau scheint).  Python verwendet also ein und denselben Ort um Variablen _und_ Funktionen abzuspeichern.  Wir wollen das ähnlich machen, und machen keinen Unterschied zwischen Operatoren, Konstanten oder durch den oder die Benutzer:in definierte Variablen.  Dazu benennen wir `operators_and_constants` zu `operators_constants_and_variables` um. Gut, dass wir diesen `dict` and nur ganz wenigen Stellen verwenden.  (Wir finden dann schon noch einen besseren Namen, versprochen!)
 
-Zweitens stellt sich die Frage nach einer sinnvollen Syntax für die Definition von Variablen. Wir haben uns für das Schlüsselwort `sto` gefolgt vom Namen der Variablen gefolgt vom Wert geeinigt.
+Zweitens stellt sich die Frage nach einer sinnvollen Syntax für die Definition von Variablen. Wir haben uns für das Schlüsselwort `sto` geeinigt, wie wir das von Taschenrechnern zum Abspeichern von Werten (engl. _store_) her kennen.  Das Schlüsselwort wird gefolgt vom Namen der Variablen und vom Wert, der abgespeichert werden soll.
 
 Zum Beispiel:
 ```scheme
 > (sto x 9)
 9
-> (sqrt x)
-3.0
+> (+ x 2)
+11
 ```
 
 Damit das Ganze funktioniert, muss die Funktion `evaluate` erweitert werden:
@@ -321,3 +328,89 @@ def evaluate(expr):
 Wenn also anstelle einer Zahl ein Name kommt, schlagen wir den in den `operators_constants_and_variables` nach, und geben den gefundenen Wert zurück.
 
 Das Abspeichern einer Variablen muss ein Spezialkonstrukt sein, denn der Name der Variablen existiert zu diesem Zeitpunkt noch gar nicht.  Wenn einen neue Variable definiert wird, muss zuerst der Wert berechnet werden, der abgespeichert werden soll. Erst danach kann der berechnete Wert unter dem angegebenen Namen in `operators_constants_and_variables` abgespeichert werden.
+
+Jetzt können wir sogar Resultate von Rechnungen abspeichern:
+
+```scheme
+> (sto x (+ 2 3))
+> (sto y (* x x))
+> y
+25
+```
+
+## Schritt 4: Funktionen, erste Version
+
+Jetzt wollen wir unseren "Rechner" zu einem programmierbaren Rechner erweitern.  Wir wollen also eigene Funktionen in unserer eigenen Sprache schreiben, welche wir danach aufrufen können.  In der ersten Version werden unsere Funktionen noch nicht ganz so funktionieren, wie wir das von gebräuchlichen Programmiersprachen her gewohnt sind.
+
+In einem ersten Schritt müssen wir uns wiederum zur Syntax Gedanken machen.  Mit `sto` haben wir bereits einen Weg gefunden, um etwas unter einem Namen abzuspeichern.  Wir brauchen also zusätzlich noch einen Weg, wie wir eine Funktion mit der Liste der Argumente schreiben wollen.  Dazu betrachten wir zuerst die Definition und das Ausführen von Funktionen in Python, um uns danach für unsere eigene Syntax zu entscheiden.
+
+![](funktionen.png)
+
+Als Schlüsselwort verwenden wir `phunk`, gefolgt von der Liste mit den Parametern und zuletzt dem Body der Funktion, also dem eigentlichen Code der ausgefhrt werden soll.
+
+Ein weiteres Beispiel könnte so aussehen:
+
+```scheme
+(sto square        ; <- Unter dem Namen `square` abspeichern
+    (phunk (x)        ; <- Definition einer Funktion (ohne Namen) mit einem Argument mit dem Namen `x`
+        (* x x)    ; <- Body der Funktion
+    )
+)
+
+(square 5)         ; <- Die oben definierte Funktion ausführen
+```
+
+Denselben Code auf jeweils einer Zeile:
+```scheme
+(sto square (phunk (x) (* x x)))
+(square 5)
+```
+
+Der Code einer Funktion wird bei der Definition nicht ausgeführt, sondern erst einmal einfach abgespeichert.  Darum muss die Definition einer Funktion mit `fn` ist ein Spezialkonstrukt unserer Sprache sein.  Der Code dazu ist sehr einfach.  Wir können einfach die Liste mit den Namen der Parameter und den Body der Funktion unverändert zurück geben.  Der _Body_ der Funktion ist der Code, welcher ausgeführt wird, wenn die Funktion aufgerufen wird.
+```py
+def evaluate(expr):
+    match expr:
+        ...
+        # Spezialkonstrukte
+            ...
+        case ["phunk", params, body]:
+            return ["phunk", params, body]
+```
+
+
+Beim Ausführen der Funktion wird es etwas komplizierter.  Am Anfang bleibt alles wie gehabt. Wir holen die Funktion aus den `operators_constants_and_variables`, welches wir mittlerweilen zu `everything` umbenannt haben, und evaluieren alle Argumente.  Danach müssen wir unterscheiden, um was für eine Funktion es sich handelt:
+ * Eine Funktion, welche in unserer Sprache geschrieben wurde
+ * Eine in Python geschriebene _eingebaute Funktion_ 
+
+Unsere eigenen Funktionen sind Listen aus den Namen der Parameter und dem Body der Funktion.  Alles andere ist dann (hoffentlich) eine in Python geschriebene Funktion:
+
+```py
+def evaluate(expr):
+    match expr:
+        ...
+        # Funktionen
+        case [operator, *args]:
+            function = evaluate(operator)
+            args = [evaluate(arg, env) for arg in args]
+
+            match function:
+                # "Eigene" Funktion
+                case ["phonk", params, body]:
+                    for i in range(len(params)):
+                        value = args[i]
+                        name = params[i]
+                        everything[name] = value
+                    return evaluate(body)
+
+                # Python Funktion
+                case _:
+                    return func(*args)
+```
+
+Bei den eingebauten Python-Funktionen ist alles wie bisher: Direkt aufrufen.
+
+Bei unseren "eigenen" Funktionen sind zwei Schritte nötig:
+1. Die übergebenen Werte unter den in der Funktionsdefinition angegebenen Parameternamen abspeichern.
+2. Den Body evaluieren und das erhaltene Resultat zurück geben.
+
+_Bemerkung:_ Bei den beiden Begriffe Parameter und Argumente einer Funktion droht Verwechslungsgefahr. Parameter bezeichnet die Liste der zu übergebenden Werte bei der _Definition_ einer Funktion.  Die konkreten Werte, welche dann beim _Aufruf_ einer Funktion übergeben werden, nennt man Argumente.  In der Python-Welt werden diese beiden Begriffe auf jeden Fall so verwendet. Sie zu verwechseln ist aber oft nicht weiter schlimm, denn meistens ist trotzdem klar, was gemeint ist.
