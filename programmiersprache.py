@@ -55,7 +55,7 @@ def fact(a):
 import math
 import random
 
-operators_constants_and_variables = {
+everything = {
     "+": add,
     "-": sub,
     "*": mult,
@@ -76,19 +76,26 @@ def evaluate(expr):
         case int(number) | float(number):
             return number
         case str(name):
-            return operators_constants_and_variables[name]
+            return everything[name]
 
         # Spezialkonstrukte
-        case ["sto", name, value]:   # Wert abspeichern
+        case ["sto", name, value]:     # Wert abspeichern
             value = evaluate(value)
-            operators_constants_and_variables[name] = value
+            everything[name] = value
             return f"{name} stored: {value}"
+        case ["phonk", [*params], body]:  # Funktionsdefinition
+            return ["phonk", params, body]
 
-        # "Normale" Operatoren ausführen
+        # Funktionen aufrufen
         case [operator, *args]:
             function = evaluate(operator)
             args = [evaluate(arg) for arg in args]
-            return function(*args)
+            match function:
+                case ["phonk", params, body]:   # Eigene Funktionen
+                    ...
+                    return evaluate(body)
+                case _:                         # Eingebaute Funktionen (in Python geschrieben)
+                    return function(*args)
 
         # Unbekannter Ausdruck -> Fehler
         case _:
@@ -101,7 +108,7 @@ def run(program):
 def repl():
     """Read-Eval-Print-Loop
     
-    Usereingabe analysieren und evaluieren.
+    User-Eingabe analysieren und evaluieren.
     """
     while True:
         try:
