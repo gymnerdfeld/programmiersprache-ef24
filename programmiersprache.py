@@ -92,7 +92,10 @@ def evaluate(expr):
             args = [evaluate(arg) for arg in args]
             match function:
                 case ["phonk", params, body]:   # Eigene Funktionen
-                    ...
+                    for i in range(len(params)):
+                        value = args[i]
+                        name = params[i]
+                        everything[name] = value
                     return evaluate(body)
                 case _:                         # Eingebaute Funktionen (in Python geschrieben)
                     return function(*args)
