@@ -346,13 +346,13 @@ In einem ersten Schritt müssen wir uns wiederum zur Syntax Gedanken machen.  Mi
 
 ![](funktionen.png)
 
-Als Schlüsselwort verwenden wir `phunk`, gefolgt von der Liste mit den Parametern und zuletzt dem Body der Funktion, also dem eigentlichen Code der ausgefhrt werden soll.
+Als Schlüsselwort verwenden wir `phonk`, gefolgt von der Liste mit den Parametern und zuletzt dem Body der Funktion, also dem eigentlichen Code der ausgefhrt werden soll.
 
 Ein weiteres Beispiel könnte so aussehen:
 
 ```scheme
 (sto square        ; <- Unter dem Namen `square` abspeichern
-    (phunk (x)        ; <- Definition einer Funktion (ohne Namen) mit einem Argument mit dem Namen `x`
+    (phonk (x)        ; <- Definition einer Funktion (ohne Namen) mit einem Argument mit dem Namen `x`
         (* x x)    ; <- Body der Funktion
     )
 )
@@ -362,7 +362,7 @@ Ein weiteres Beispiel könnte so aussehen:
 
 Denselben Code auf jeweils einer Zeile:
 ```scheme
-(sto square (phunk (x) (* x x)))
+(sto square (phonk (x) (* x x)))
 (square 5)
 ```
 
@@ -373,8 +373,8 @@ def evaluate(expr):
         ...
         # Spezialkonstrukte
             ...
-        case ["phunk", params, body]:
-            return ["phunk", params, body]
+        case ["phonk", params, body]:
+            return ["phonk", params, body]
 ```
 
 
