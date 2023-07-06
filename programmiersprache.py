@@ -56,7 +56,7 @@ def block(*args):
     if len(args) == 0:
         return None
     else:
-        args[-1]
+        return args[-1]
 
 import math
 import random
