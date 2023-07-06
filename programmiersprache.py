@@ -15,7 +15,7 @@ def parse(tokens):
         return lst
     else:
         return parse_atom(token)
-    
+
 def parse_atom(token):
     """Tokens, welche keine Klammern sind, wenn möglich umwandeln.
     """
@@ -46,12 +46,6 @@ def div_int(a, b):
 def expt(a, b):
     return a ** b
 
-def fact(a):
-    if a < 2:
-        return 1
-    else:
-        return a * fact(a - 1)
-
 def block(*args):
     if len(args) == 0:
         return None
@@ -60,6 +54,7 @@ def block(*args):
 
 import math
 import random
+import operator as op
 
 # Eingebaute Funktionen
 builtins = {
@@ -69,9 +64,8 @@ builtins = {
     "/": div,
     "//": div_int,
     "expt": expt,
-    "fact": fact,
     "sin": math.sin,
-    "e": math.e,
+    "<": op.lt,
     "random": random.random,
     "block": block,
 }
@@ -80,8 +74,17 @@ builtins = {
 library = """
 (block
     (sto pi 3.141592653589793)
+    (sto e 2.718281828459045)
     (sto cos (phonk (a) (sin (+ a (/ pi 2)))))
-
+    (sto fact (phonk (n)
+        (if (< n 2) 1 (* n (fact (- n 1))))
+    ))
+    (sto abs (phonk (x)
+        (if (< x 0)
+            (- 0 x)
+            x
+        )
+    ))
 )
 """
 
@@ -114,6 +117,11 @@ def evaluate(expr, env=global_env):
             return f"{name} stored: {value}"
         case ["phonk", [*params], body]:  # Funktionsdefinition
             return ["phonk", params, body]
+        case ["if", condition, true_body, false_body]:
+            if evaluate(condition, env):
+                return evaluate(true_body, env)
+            else:
+                return evaluate(false_body, env)
 
         # Funktionen aufrufen
         case [operator, *args]:
@@ -150,7 +158,7 @@ def run(program):
 
 def repl():
     """Read-Eval-Print-Loop
-    
+
     User-Eingabe analysieren und evaluieren.
     """
     run(library)
