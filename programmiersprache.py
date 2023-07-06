@@ -55,7 +55,8 @@ def fact(a):
 import math
 import random
 
-everything = {
+# Eingebaute Funktionen und Konstanten
+builtins = {
     "+": add,
     "-": sub,
     "*": mult,
@@ -70,33 +71,59 @@ everything = {
     "random": random.random,
 }
 
-def evaluate(expr):
+
+# Globales Environment
+global_env = [{}, builtins]
+
+def evaluate(expr, env=global_env):
     match expr:
         # Einfache Werte
         case int(number) | float(number):
             return number
         case str(name):
-            return everything[name]
+            # Variablen im Environment von vorne nach hinten
+            # suchen
+            for local_env in env:
+                if name in local_env:
+                    return local_env[name]
+
+            # Nichts gefunden unter dem angegebenen Name: Error
+            raise NameError(f"name '{name}' is not defined")
 
         # Spezialkonstrukte
         case ["sto", name, value]:     # Wert abspeichern
-            value = evaluate(value)
-            everything[name] = value
+            value = evaluate(value, env)
+
+            # Neue Variable im vordersten dict vom Environment
+            # abspeichern
+            local_env = env[0]
+            local_env[name] = value
             return f"{name} stored: {value}"
         case ["phonk", [*params], body]:  # Funktionsdefinition
             return ["phonk", params, body]
 
         # Funktionen aufrufen
         case [operator, *args]:
-            function = evaluate(operator)
-            args = [evaluate(arg) for arg in args]
+            function = evaluate(operator, env)
+            args = [evaluate(arg, env) for arg in args]
             match function:
                 case ["phonk", params, body]:   # Eigene Funktionen
+                    # Neues dict für lokale Variablen erstellen
+                    local_env = {}
+
+                    # Argumente unter den Parameternamen im neuen dict
+                    # abspeichern
                     for i in range(len(params)):
                         value = args[i]
                         name = params[i]
-                        everything[name] = value
-                    return evaluate(body)
+                        local_env[name] = value
+
+                    # Neues Environment erstellen, mit den neuen
+                    # lokalen Variablen zuvorderst
+                    new_env = [local_env, *env]
+
+                    # Body in neuem Environment ausführen / evaluieren
+                    return evaluate(body, new_env)
                 case _:                         # Eingebaute Funktionen (in Python geschrieben)
                     return function(*args)
 
