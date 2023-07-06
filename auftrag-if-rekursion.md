@@ -5,7 +5,7 @@ In der aktuelle Version unserer Programmiersprache können Funktionen programmie
 Zum Beispiel kann man nun die Wurzelfunktion `sqrt` direkt in unserer Sprache umsetzen:
 
 ```scm
-(var sqrt (fn (x) (expt x 0.5)))
+(sto sqrt (phonk (x) (expt x 0.5)))
 
 (sqrt 4)  ;; -> 2.0
 ```
@@ -33,7 +33,7 @@ Aktuell fehlt dazu in unserer Sprache noch die `if`-Anweisung sowie der `==`-Ver
 
 Als ersten Test könnte die folgende `iszero?`-Funktion dienen, welche überprüft, ob eine Zahl null ist.
 ```scm
-(var iszero? (fn (a) (if () 1 0)))
+(sto iszero? (phonk (a) (if (== a 0) 1 0)))
 
 (iszero? 15)   ;; -> 0
 (iszero? 0)    ;; -> 1
@@ -45,8 +45,8 @@ Als ersten Test könnte die folgende `iszero?`-Funktion dienen, welche überprü
 
 Nun kann die Fakultätsfunktion definiert werden:
 ```scm
-(var fact
-    (fn (a) 
+(sto fact
+    (phonk (a) 
         (if 
             (== 0 a) 
             1
@@ -58,7 +58,7 @@ Nun kann die Fakultätsfunktion definiert werden:
 
 Oder auf einer Zeile für praktisches copy-pasten:
 ```scm
-(var fact (fn (a) (if (== 0 a) 1 (* a (fact (- a 1))))))
+(sto fact (phonk (a) (if (== 0 a) 1 (* a (fact (- a 1))))))
 ```
 
 **Auftrag:** Teste die `fact`-Funktion
@@ -77,8 +77,6 @@ Offenbar hast du eine unendliche lange Berechnung gestartet. Was könnte der Gru
 _Tipp:_ Studiere die [Zeile 78](#file-taschenrechner-py-L78) im Code unten.
 
 **Auftrag:** Ändere deinen Code, so dass der Fehler nicht mehr auftritt.
-
-(Ein Zusatztipp gibt es in der zweiten Ferienwoche)
 
 ## Zusatzaufgabe
 
