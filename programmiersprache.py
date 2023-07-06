@@ -52,10 +52,16 @@ def fact(a):
     else:
         return a * fact(a - 1)
 
+def block(*args):
+    if len(args) == 0:
+        return None
+    else:
+        args[-1]
+
 import math
 import random
 
-# Eingebaute Funktionen und Konstanten
+# Eingebaute Funktionen
 builtins = {
     "+": add,
     "-": sub,
@@ -65,12 +71,19 @@ builtins = {
     "expt": expt,
     "fact": fact,
     "sin": math.sin,
-    "cos": math.cos,
-    "pi": math.pi,
     "e": math.e,
     "random": random.random,
+    "block": block,
 }
 
+# Library (in unserer Sprache geschriebener Code)
+library = """
+(block
+    (sto pi 3.141592653589793)
+    (sto cos (phonk (a) (sin (+ a (/ pi 2)))))
+
+)
+"""
 
 # Globales Environment
 global_env = [{}, builtins]
@@ -140,6 +153,8 @@ def repl():
     
     User-Eingabe analysieren und evaluieren.
     """
+    run(library)
+
     while True:
         try:
             prog = input('> ').strip()
