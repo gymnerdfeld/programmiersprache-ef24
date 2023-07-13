@@ -74,7 +74,7 @@ Error: RecursionError('maximum recursion depth exceeded')
 
 Offenbar hast du eine unendliche lange Berechnung gestartet. Was könnte der Grund dafür sein?
 
-_Tipp:_ Studiere die [Zeile 78](#file-taschenrechner-py-L78) im Code unten.
+<!-- _Tipp:_ Studiere die [Zeile 78](#file-taschenrechner-py-L78) im Code unten. -->
 
 **Auftrag:** Ändere deinen Code, so dass der Fehler nicht mehr auftritt.
 
