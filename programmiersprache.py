@@ -1,6 +1,21 @@
 def tokenize(program):
-    """Programmtext in die logischen Blöcke aufteilen.
+    """Programmtext in die logischen Blöcke aufteilen, und Kommentare entfernen
     """
+    
+    # Kommentare entfernen
+    zeilen_alt = program.split("\n")
+    zeilen_neu = []
+
+    for zeile in zeilen_alt:
+        if ";" in zeile:
+            # An welcher Position steht das erste Semikolon?
+            zeilen_neu.append(zeile[:zeile.find(";")])
+        else:
+            zeilen_neu.append(zeile)
+
+    # Zeilen wieder zusammensetzten
+    program = "\n".join(zeilen_neu)
+    
     return program.replace("(", " ( ").replace(")", " ) ").split()
 
 def parse(tokens):
