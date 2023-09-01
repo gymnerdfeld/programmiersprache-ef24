@@ -90,8 +90,9 @@ builtins = {
 # Library (in unserer Sprache geschriebener Code)
 library = """
 (block
+    ;;;;;;;;;;;; Mathematische Funktionen ;;;;;;;;;;;;;;;;;;
     (sto pi 3.141592653589793)
-    (sto e 2.718281828459045)
+    (sto e 2.718281828459045)    ; Eulersche Zahl
     (sto cos (phonk (a) (sin (+ a (/ pi 2)))))
     (sto fact (phonk (n)
         (if (< n 2) 1 (* n (fact (- n 1))))
@@ -102,6 +103,13 @@ library = """
             x
         )
     ))
+    
+    ;;;;;;;;;;;; Vergleichsfunktionen ;;;;;;;;;;;;;;;;;;
+    
+    (sto > (phonk (a b) (< b a)))
+    (sto >= (phonk (a b) (if (< a b) False True)))
+    
+    (sto not (phonk (a) (if a False True)))
 )
 """
 
