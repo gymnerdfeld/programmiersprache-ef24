@@ -67,6 +67,20 @@ def block(*args):
     else:
         return args[-1]
 
+
+def dict_new():
+    return {}
+
+def dict_in(d, key):
+    return key in d
+
+def dict_add(d, key, val):
+    d[key] = val
+    return val
+
+def dict_get(d, key):
+    return d[key]
+
 import math
 import random
 import operator as op
@@ -85,6 +99,10 @@ builtins = {
     "block": block,
     "True": True,
     "False": False,
+    "dict-new": dict_new,
+    "dict-in": dict_in,
+    "dict-add": dict_add,
+    "dict-get": dict_get,
 }
 
 # Library (in unserer Sprache geschriebener Code)
