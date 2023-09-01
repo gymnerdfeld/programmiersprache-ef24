@@ -83,6 +83,8 @@ builtins = {
     "<": op.lt,
     "random": random.random,
     "block": block,
+    "True": True,
+    "False": False,
 }
 
 # Library (in unserer Sprache geschriebener Code)
